@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Backend FastAPI Service
+  backend:
+    build: ./backend
+    container_name: lifehub_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mounts the local backend code into the container for live-reloading
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend React Service
+  # NOTE: In a real production setup, we'd use NGINX to serve the built files.
+  # For local development, running the Vite dev server is much better.
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev # We will create a simple dev Dockerfile
+    container_name: lifehub_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mounts local frontend code for hot-reloading
+      - ./frontend:/app
+      # Prevents node_modules from being overwritten by the mount
+      - /app/node_modules
+    depends_on:
+      - backend

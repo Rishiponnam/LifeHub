@@ -1,0 +1,57 @@
+lifehub/
+├── .github/                      # CI/CD workflows
+│   └── workflows/
+│       └── main.yml              # GitHub Actions pipeline for testing & deployment
+├── backend/                      # FastAPI Application
+│   ├── app/
+│   │   ├── api/                  # API endpoints (routers)
+│   │   │   ├── v1/
+│   │   │   │   ├── endpoints/
+│   │   │   │   │   ├── auth.py
+│   │   │   │   │   ├── users.py
+│   │   │   │   │   └── tasks.py
+│   │   │   │   └── deps.py       # Dependency injection functions
+│   │   │   └── __init__.py
+│   │   ├── core/                 # Configuration and core logic
+│   │   │   ├── config.py         # Environment variables, settings
+│   │   │   └── security.py       # Hashing, JWT creation/verification
+│   │   ├── crud/                 # CRUD (Create, Read, Update, Delete) operations
+│   │   │   ├── crud_user.py
+│   │   │   └── crud_task.py
+│   │   ├── db/                   # Database session, models, and setup
+│   │   │   ├── base.py           # Base for SQLAlchemy models
+│   │   │   ├── models.py         # SQLAlchemy ORM models (tables)
+│   │   │   └── session.py        # Database session management
+│   │   ├── schemas/              # Pydantic schemas for data validation
+│   │   │   ├── token.py
+│   │   │   ├── user.py
+│   │   │   └── task.py
+│   │   ├── services/             # Business logic (e.g., interacting with Gemini AI)
+│   │   │   └── ai_assistant.py
+│   │   ├── workers/              # Celery worker definitions
+│   │   │   └── tasks.py          # E.g., send_summary_email task
+│   │   └── main.py               # Main FastAPI app instance
+│   ├── tests/                    # Pytest tests
+│   ├── Dockerfile                # Dockerfile for the backend
+│   └── requirements.txt          # Python dependencies
+├── frontend/                     # React Application
+│   ├── public/                   # Static assets
+│   ├── src/
+│   │   ├── api/                  # Axios instances and API call functions
+│   │   │   └── apiClient.js
+│   │   ├── assets/               # Images, fonts, etc.
+│   │   ├── components/           # Reusable UI components (Button, Chart, Timer)
+│   │   ├── contexts/             # React Context for global state (e.g., AuthContext)
+│   │   ├── hooks/                # Custom React hooks (e.g., useAuth, useTasks)
+│   │   ├── pages/                # Main page components (Dashboard, Login, Settings)
+│   │   ├── utils/                # Utility functions
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── Dockerfile                # Dockerfile for the frontend (for building)
+│   └── package.json              # JS dependencies
+├── nginx/
+│   └── default.conf              # NGINX configuration
+├── .dockerignore
+├── .gitignore
+├── docker-compose.yml            # For local development environment
+└── README.md
