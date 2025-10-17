@@ -1,3 +1,15 @@
+# FastAPI framework and server
 fastapi
 uvicorn[standard]
+
+# Database ORM and adapter
+sqlalchemy
+psycopg2-binary
+alembic
+
+# Environment variable management and Pydantic settings
+pydantic-settings
 python-dotenv
+
+# Password hashing (will be used in auth.py)
+passlib[bcrypt]

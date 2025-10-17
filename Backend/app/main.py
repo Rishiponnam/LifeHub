@@ -1,33 +1,28 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Create the FastAPI app instance
-app = FastAPI(title="LifeHub API")
+# We will create api_router in the next steps
+# from app.api.v1.api import api_router
+from app.core.config import settings
 
-# Configure CORS (Cross-Origin Resource Sharing)
-# This allows our React frontend (running on a different port)
-# to communicate with our backend.
-origins = [
-    "http://localhost",
-    "http://localhost:5173", # Default Vite dev server port
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+app = FastAPI(
+    title="LifeHub API",
+    openapi_url=f"/api/v1/openapi.json"
 )
 
-# A simple root endpoint to check if the API is running
+# Set all CORS enabled origins
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+# Placeholder for future API routers
+# app.include_router(api_router, prefix="/api/v1")
+
 @app.get("/")
 def read_root():
-    """ A simple health check endpoint. """
-    return {"status": "ok", "message": "Welcome to LifeHub API!"}
-
-# Our first real API endpoint for the frontend to call
-@app.get("/api/v1/hello")
-def read_hello():
-    """ Returns a greeting message from the backend. """
-    return {"message": "Hello from the LifeHub Backend! 👋"}
+    return {"message": "Welcome to LifeHub API!"}
