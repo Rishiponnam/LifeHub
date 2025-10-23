@@ -1,6 +1,7 @@
 # FastAPI framework and server
 fastapi
 uvicorn[standard]
+jose
 
 # Database ORM and adapter
 sqlalchemy

@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.v1.api import api_router # Import the router
+from app.core.config import settings
 
 # We will create api_router in the next steps
 # from app.api.v1.api import api_router
@@ -20,8 +22,7 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
-# Placeholder for future API routers
-# app.include_router(api_router, prefix="/api/v1")
+app.include_router(api_router, prefix="/api/v1") # Include the API router
 
 @app.get("/")
 def read_root():
