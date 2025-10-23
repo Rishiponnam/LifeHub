@@ -1,7 +1,7 @@
 # FastAPI framework and server
 fastapi
 uvicorn[standard]
-jose
+python-jose[cryptography]
 
 # Database ORM and adapter
 sqlalchemy
@@ -14,3 +14,5 @@ python-dotenv
 
 # Password hashing (will be used in auth.py)
 passlib[bcrypt]
+
+pydantic[email]

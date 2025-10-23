@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
 
 class Settings(BaseSettings):
     """
@@ -14,9 +15,12 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # Secret key for signing JWTs
-    SECRET_KEY: str = "a_very_secret_key_that_should_be_changed"
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # CORS origins, this will allow requests from specified origins
+    BACKEND_CORS_ORIGINS: List[str] = ["*"]  # Allow all origins by default. Adjust as needed.
 
 
 # Create a single instance of the settings to be used throughout the app
