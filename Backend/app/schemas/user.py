@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional  # Import Optional from typing
+from .profile import UserProfile
 
 # Shared properties
 class UserBase(BaseModel):
@@ -16,9 +17,23 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None  # Use Optional[str] instead of str | None
     email: Optional[EmailStr] = None  # Use Optional[EmailStr] instead of EmailStr | None
 
+# # Properties shared by models stored in DB
+# class UserInDBBase(UserBase):
+#     id: int
+#     is_active: bool
+
+#     class Config:
+#         orm_mode = True
+
+# # Properties to return to client
+# class User(UserInDBBase):
+#     pass
+
 # Properties shared by models stored in DB
-class UserInDBBase(UserBase):
+class UserInDBBase(BaseModel): # Renamed from UserBase in previous step
     id: int
+    full_name: Optional[str] = None
+    email: EmailStr
     is_active: bool
 
     class Config:
@@ -26,7 +41,7 @@ class UserInDBBase(UserBase):
 
 # Properties to return to client
 class User(UserInDBBase):
-    pass
+    profile: Optional[UserProfile] = None # Nest the profile here!
 
 # Properties stored in DB
 class UserInDB(UserInDBBase):
