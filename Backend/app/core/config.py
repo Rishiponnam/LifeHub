@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # CORS origins, this will allow requests from specified origins
     BACKEND_CORS_ORIGINS: List[str] = ["*"]  # Allow all origins by default. Adjust as needed.
 
+    #Gemini API Key
+    GEMINI_API_KEY: str
+
 
 # Create a single instance of the settings to be used throughout the app
 settings = Settings()

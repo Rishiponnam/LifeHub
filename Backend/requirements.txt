@@ -13,6 +13,13 @@ pydantic-settings
 python-dotenv
 
 # Password hashing (will be used in auth.py)
-passlib[bcrypt]
+passlib 
+bcrypt==4.0.1
 
 pydantic[email]
+
+#AI
+google-generativeai
+
+#Frontend
+chart.js react-chartjs-2

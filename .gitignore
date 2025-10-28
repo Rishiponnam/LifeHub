@@ -1,0 +1,14 @@
+node_modules/
+# npm-debug.log
+# yarn-error.log
+# pnpm-debug.log
+
+# Backend Python (Django/Flask)
+__pycache__/
+
+
+# Environment Variables
+.env
+
+# IDEs & Editors
+.vs/
