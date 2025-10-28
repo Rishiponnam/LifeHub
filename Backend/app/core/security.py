@@ -16,7 +16,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
      # Truncate password if it exceeds 72 characters
     if len(password) > MAX_PASSWORD_LENGTH:
+        print(f"password length before truncation: {len(password)}")
+        print(f"Password before truncation: {password}")        
         password = password[:MAX_PASSWORD_LENGTH]
+        print(f"Password after truncation: {password}")
     return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

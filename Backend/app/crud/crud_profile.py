@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.db.models import UserProfile
+from app.db.models.models import UserProfile
 from app.schemas.profile import UserProfileCreate, UserProfileUpdate
 
 def get_profile(db: Session, user_id: int):
