@@ -36,6 +36,7 @@ class User(Base):
     workout_plans = relationship("WorkoutPlan", back_populates="owner")
     workout_logs = relationship("WorkoutLog", back_populates="owner")
     meal_logs = relationship("UserMealLog", back_populates="owner")
+    # meal_plans = relationship("MealPlan", back_populates="owner", cascade="all, delete-orphan")
 
 # --- User Profile Model (for Stats) ---
 class UserProfile(Base):
@@ -91,10 +92,10 @@ class FoodItem(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, index=True)
     # Per 100g
-    calories = Column(Float, nullable=False)
-    protein = Column(Float, nullable=False)
-    carbs = Column(Float, nullable=False)
-    fat = Column(Float, nullable=False)
+    calories_per_100g = Column(Float, nullable=False)
+    protein_per_100g = Column(Float, nullable=False)
+    carbs_per_100g = Column(Float, nullable=False)
+    fat_per_100g = Column(Float, nullable=False)
     # We can add user_id to make this a user-specific food db
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
@@ -107,3 +108,15 @@ class UserMealLog(Base):
     total_macros_json = Column(String)
     
     owner = relationship("User", back_populates="meal_logs")
+
+# class MealPlan(Base):
+#     __tablename__ = "meal_plans"
+    
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String, nullable=False, index=True)
+#     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+#     # We will store the full array of LoggedFoodItem as a JSON string
+#     items_json = Column(String, nullable=False) 
+    
+#     owner = relationship("User", back_populates="meal_plans")

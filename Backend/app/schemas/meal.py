@@ -41,3 +41,18 @@ class NaturalLanguageQuery(BaseModel):
 class MacroAnalysisResponse(BaseModel):
     items: list[LoggedFoodItem]
     totals: dict
+
+# Schema for Meal Plans
+# class MealPlanBase(BaseModel):
+#     name: str
+#     items: list[LoggedFoodItem] # We re-use the schema from our meal logs
+
+# class MealPlanCreate(MealPlanBase):
+#     pass
+
+# class MealPlan(MealPlanBase):
+#     id: int
+#     user_id: int
+
+#     class Config:
+#         orm_mode = True

@@ -46,3 +46,32 @@ def log_meal(db: Session, user_id: int, log_date: date, items_to_log: list[Logge
     db.refresh(db_log)
     
     return db_log
+
+# def create_meal_plan(db: Session, user_id: int, plan_in: MealPlanCreate):
+#     """
+#     Saves a new reusable meal plan for a user.
+#     """
+#     # Convert the list of items into a JSON string for the DB
+#     items_json_string = MealLogContents(items=plan_in.items).json()
+    
+#     db_plan = MealPlan(
+#         name=plan_in.name,
+#         user_id=user_id,
+#         items_json=items_json_string
+#     )
+#     db.add(db_plan)
+#     db.commit()
+#     db.refresh(db_plan)
+#     return db_plan
+
+# def get_meal_plans_by_user(db: Session, user_id: int):
+#     """
+#     Retrieves all meal plans for a specific user.
+#     """
+#     return db.query(MealPlan).filter(MealPlan.user_id == user_id).all()
+
+# def get_meal_plan_by_id(db: Session, plan_id: int):
+#     """
+#     Retrieves a single meal plan by its ID.
+#     """
+#     return db.query(MealPlan).filter(MealPlan.id == plan_id).first()

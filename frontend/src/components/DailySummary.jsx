@@ -4,8 +4,14 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function DailySummary({ log }) {
-  const { total_macros, food_items } = log;
+
+  if (!log) {
+    throw new Error('Log data is missing!'); // Manually throw an error for testing
+  }
+
+  const { total_macros = {}, food_items = {} } = log;
   const { calories, protein, carbs, fat } = total_macros;
+  const { items = [] } = food_items;
 
   // Chart.js data
   const macroData = {
@@ -47,7 +53,7 @@ export function DailySummary({ log }) {
 
       <h4>Logged Items:</h4>
       <ul>
-        {food_items.items.map((item, index) => (
+        {items.map((item, index) => (
           <li key={index}>
             {item.name} ({item.quantity_g}g) - {item.calories.toFixed(0)} kcal
           </li>
@@ -56,3 +62,42 @@ export function DailySummary({ log }) {
     </div>
   );
 }
+
+// export function DailySummary({ log }) {
+//   if (!log) return <div>No log data available</div>;
+
+//   const { food_items, total_macros } = log;
+
+//   // If food_items is an object, render it correctly
+//   const foodItemsList = food_items.items ? (
+//     <ul>
+//       {food_items.items.map((item, index) => (
+//         <li key={index}>
+//           {item.name}: {item.quantity_g}g, {item.calories} kcal
+//         </li>
+//       ))}
+//     </ul>
+//   ) : (
+//     <div>No food items available.</div>
+//   );
+
+//   // Total macros
+//   const totalMacros = total_macros ? (
+//     <div>
+//       <p>Calories: {total_macros.calories}</p>
+//       <p>Protein: {total_macros.protein}g</p>
+//       <p>Carbs: {total_macros.carbs}g</p>
+//       <p>Fat: {total_macros.fat}g</p>
+//     </div>
+//   ) : (
+//     <div>No total macros available.</div>
+//   );
+
+//   return (
+//     <div>
+//       <h3>Daily Summary for {log.date}</h3>
+//       {foodItemsList}
+//       {totalMacros}
+//     </div>
+//   );
+// }

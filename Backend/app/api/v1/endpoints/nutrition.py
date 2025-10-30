@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException, Body, Query
 from sqlalchemy.orm import Session
 from datetime import date
 
 from app.api.v1 import deps
 from app.db.models.models import User
+from app.schemas import meal
 from app.schemas.food import FoodItem, FoodItemCreate
 from app.schemas.meal import (UserMealLogCreate, NaturalLanguageQuery, 
                              MacroAnalysisResponse, UserMealLog, LoggedFoodItem)
@@ -47,7 +48,7 @@ def log_meal_for_user(
     *,
     db: Session = Depends(deps.get_db),
     log_in: UserMealLogCreate,
-    log_date: date = Body(default_factory=date.today), # Log to today by default
+    log_date: date = Query(default_factory=date.today), # Log to today by default
     current_user: User = Depends(deps.get_current_user)
 ):
     """
@@ -113,3 +114,88 @@ def analyze_meal_from_text(
     if not analysis:
         raise HTTPException(status_code=500, detail="Error analyzing meal text")
     return analysis
+
+# @router.post("/meal-plans", response_model=meal.MealPlan)
+# def create_saved_meal_plan(
+#     *,
+#     db: Session = Depends(deps.get_db),
+#     plan_in: meal.MealPlanCreate,
+#     current_user: User = Depends(deps.get_current_user)
+# ):
+#     """
+#     Save a list of food items as a reusable meal plan.
+#     (e.g., from an AI analysis)
+#     """
+#     db_plan = crud_meal.create_meal_plan(db=db, user_id=current_user.id, plan_in=plan_in)
+    
+#     # We must manually parse the JSON string back into a list for the response
+#     return {
+#         "id": db_plan.id,
+#         "name": db_plan.name,
+#         "user_id": db_plan.user_id,
+#         "items": json.loads(db_plan.items_json).get("items", [])
+#     }
+
+# @router.get("/meal-plans", response_model=list[meal.MealPlan])
+# def get_saved_meal_plans(
+#     *,
+#     db: Session = Depends(deps.get_db),
+#     current_user: User = Depends(deps.get_current_user)
+# ):
+#     """
+#     Get all saved meal plans for the current user.
+#     """
+#     plans = crud_meal.get_meal_plans_by_user(db=db, user_id=current_user.id)
+    
+#     # Manually parse the JSON string for each plan in the list
+#     response_list = []
+#     for plan in plans:
+#         response_list.append({
+#             "id": plan.id,
+#             "name": plan.name,
+#             "user_id": plan.user_id,
+#             "items": json.loads(plan.items_json).get("items", [])
+#         })
+#     return response_list
+
+# @router.post("/meal-plans/{plan_id}/log")
+# def log_saved_meal_plan(
+#     *,
+#     db: Session = Depends(deps.get_db),
+#     plan_id: int,
+#     log_date: date = Query(default_factory=date.today),
+#     current_user: User = Depends(deps.get_current_user)
+# ):
+#     """
+#     Finds a saved meal plan by its ID and logs all its items
+#     to the user's meal log for the given date.
+#     """
+#     db_plan = crud_meal.get_meal_plan_by_id(db=db, plan_id=plan_id)
+    
+#     if not db_plan:
+#         raise HTTPException(status_code=404, detail="Meal plan not found")
+#     if db_plan.user_id != current_user.id:
+#         raise HTTPException(status_code=403, detail="Not authorized to log this plan")
+    
+#     # Get the items from the saved plan's JSON
+#     items_to_log = meal.MealLogContents.parse_raw(db_plan.items_json).items
+    
+#     if not items_to_log:
+#         raise HTTPException(status_code=400, detail="Meal plan is empty")
+        
+#     # Use our existing log_meal function to add them to the day's log
+#     db_log = crud_meal.log_meal(
+#         db=db,
+#         user_id=current_user.id,
+#         log_date=log_date,
+#         items_to_log=items_to_log
+#     )
+    
+#     # Return the same response as the other log endpoint
+#     return {
+#         "id": db_log.id,
+#         "date": db_log.date,
+#         "user_id": db_log.user_id,
+#         "food_items": json.loads(db_log.food_items_json),
+#         "total_macros": json.loads(db_log.total_macros_json)
+#     }

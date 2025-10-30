@@ -6,6 +6,7 @@ export function MealLogger({ selectedDate, onMealLogged }) {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null); // To hold AI results
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleAnalyze = async () => {
     if (!query) return;
@@ -47,12 +48,43 @@ export function MealLogger({ selectedDate, onMealLogged }) {
     setIsLoading(false);
   };
 
+  const handleSavePlan = async () => {
+    if (!analysis || !analysis.items.length) return;
+    
+    const planName = prompt("Enter a name for this meal plan:", "My Breakfast");
+    if (!planName) return; // User cancelled
+    
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+    
+    try {
+      const planPayload = {
+        name: planName,
+        items: analysis.items
+      };
+      await apiClient.post('/nutrition/meal-plans', planPayload);
+      setSuccess(`Meal plan "${planName}" saved!`);
+      // We might want to trigger a refresh of the saved meals list here
+      // (This is a more advanced step for later)
+      
+    } catch (err) {
+      setError('Failed to save meal plan.');
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="meal-logger">
-      <h4>Log a Meal</h4>
+      <h4>Log a Meal via AI</h4>
       <textarea
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+            setQuery(e.target.value);
+            setAnalysis(null); // Clear analysis on new text
+            setError('');
+            setSuccess('');
+        }}
         placeholder="e.g., Had paneer with rice and dal"
         rows={3}
         disabled={isLoading}
@@ -62,29 +94,37 @@ export function MealLogger({ selectedDate, onMealLogged }) {
       </button>
       
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      
+      {success && <p style={{ color: 'green' }}>{success}</p>}
+
       {analysis && (
         <div className="analysis-preview">
           <h5>Analysis Results:</h5>
-          <p>
-            <strong>Total Calories: {analysis.totals.calories.toFixed(0)}</strong>
-          </p>
+          
+          {/* --- UPDATED TOTALS DISPLAY --- */}
+          <div className="totals-summary">
+            <p><strong>Calories: {analysis.totals.calories.toFixed(0)}</strong></p>
+            <p>Protein: {analysis.totals.protein.toFixed(1)}g</p>
+            <p>Carbs: {analysis.totals.carbs.toFixed(1)}g</p>
+            <p>Fat: {analysis.totals.fat.toFixed(1)}g</p>
+          </div>
+
           <ul>
             {analysis.items.map((item, index) => (
               <li key={index}>
                 {item.name} ({item.quantity_g}g) - {item.calories.toFixed(0)} kcal
+                (P:{item.protein.toFixed(1)}g, C:{item.carbs.toFixed(1)}g, F:{item.fat.toFixed(1)}g)
               </li>
             ))}
           </ul>
-          <button onClick={handleLogMeal} disabled={isLoading}>
-            Confirm & Log Meal
-          </button>
+          
+          {/* --- UPDATED BUTTONS --- */}
+          <div className="button-group">
+            <button onClick={handleLogMeal} disabled={isLoading}>
+              Confirm & Log Meal
+            </button>
+          </div>
         </div>
       )}
-      {/* We would also add a "Log Manual Entry" section here,
-        which would have fields for name, calories, protein, etc.
-        and call the same handleLogMeal function.
-      */}
     </div>
   );
 }
