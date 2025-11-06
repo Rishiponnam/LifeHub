@@ -1,33 +1,52 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import './App.css';
 
-// You would put these in separate files in a /pages/ directory
+// Page Components
 import LoginPage from './pages/LoginPage';
-import Dashboard from './pages/Dashboard';
 import ProfileSetupPage from './pages/ProfileSetupPage';
+import Dashboard from './pages/Dashboard';
+import NutritionHubPage from './pages/NutritionHubPage';
+import AILoggerPage from './pages/AILoggerPage';
+import MyFoodsPage from './pages/MyFoodsPage';
+import MealSummaryPage from './pages/MealSummaryPage';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Placeholder for coming soon pages
+const ComingSoon = () => <div className="App-header"><h1>Coming Soon!</h1></div>;
 
 function App() {
-  const { user, token } = useAuth();
+  const { token, loading, user } = useAuth();
 
-  if (!token) {
-    // No token, show the login/register page
-    // We can make LoginPage handle both
-    return <LoginPage />;
+  if (loading) {
+    return <div className="App-header">Loading app...</div>;
   }
 
-  if (user && !user.profile) {
-    // Logged in, but no profile.
-    // Force them to the profile setup wizard.
-    return <ProfileSetupPage />;
-  }
-  
-  if (user && user.profile) {
-    // Logged in AND has a profile. Show the main app.
-    return <Dashboard />;
-  }
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={!token ? <LoginPage /> : <Navigate to="/" />} />
+      <Route path="/profile-setup" element={token && !user?.profile ? <ProfileSetupPage /> : <Navigate to="/" />} />
+      
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/nutrition" element={<NutritionHubPage />} />
+        <Route path="/nutrition/ai-logger" element={<AILoggerPage />} />
+        <Route path="/nutrition/my-foods" element={<MyFoodsPage />} />
+        <Route path="/nutrition/summary" element={<MealSummaryPage />} />
+        
+        {/* Placeholder Routes */}
+        <Route path="/workouts" element={<ComingSoon />} />
+        <Route path="/guidance" element={<ComingSoon />} />
+        <Route path="/analytics" element={<ComingSoon />} />
+        <Route path="/progress" element={<ComingSoon />} />
+      </Route>
 
-  // Fallback for loading state, etc.
-  return <div className="App-header">Loading...</div>;
+      {/* Fallback route */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
 }
 
 export default App;

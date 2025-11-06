@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.db.models.models import UserMealLog
-from app.schemas.meal import LoggedFoodItem, MealLogContents
+from app.schemas.meal import LoggedFoodItem, MealLogContents, UserMealLogCreate
 from datetime import date
 import json
 
@@ -75,3 +75,65 @@ def log_meal(db: Session, user_id: int, log_date: date, items_to_log: list[Logge
 #     Retrieves a single meal plan by its ID.
 #     """
 #     return db.query(MealPlan).filter(MealPlan.id == plan_id).first()
+
+def delete_logged_item(db: Session, db_log: UserMealLog, log_item_id: str) -> UserMealLog:
+    """
+    Deletes a single item from a meal log by its log_item_id.
+    """
+    current_contents = MealLogContents.parse_raw(db_log.food_items_json)
+    
+    # Find and remove the item
+    item_to_remove = next((item for item in current_contents.items if item.log_item_id == log_item_id), None)
+    if not item_to_remove:
+        return db_log # Item not found, do nothing
+
+    current_contents.items.remove(item_to_remove)
+    
+    # Recalculate totals
+    total_calories = sum(item.calories for item in current_contents.items)
+    total_protein = sum(item.protein for item in current_contents.items)
+    total_carbs = sum(item.carbs for item in current_contents.items)
+    total_fat = sum(item.fat for item in current_contents.items)
+
+    totals = {"calories": total_calories, "protein": total_protein, "carbs": total_carbs, "fat": total_fat}
+
+    # Save back to DB
+    db_log.food_items_json = current_contents.json()
+    db_log.total_macros_json = json.dumps(totals)
+    
+    db.add(db_log)
+    db.commit()
+    db.refresh(db_log)
+    return db_log
+
+def update_logged_item(db: Session, db_log: UserMealLog, log_item_id: str, item_in: LoggedFoodItem) -> UserMealLog:
+    """
+    Updates a single item in a meal log.
+    """
+    current_contents = MealLogContents.parse_raw(db_log.food_items_json)
+    
+    # Find and replace the item
+    item_index = next((i for i, item in enumerate(current_contents.items) if item.log_item_id == log_item_id), -1)
+    
+    if item_index == -1:
+        return db_log # Item not found
+
+    # Replace old item with new one
+    current_contents.items[item_index] = item_in
+    
+    # Recalculate totals
+    total_calories = sum(item.calories for item in current_contents.items)
+    total_protein = sum(item.protein for item in current_contents.items)
+    total_carbs = sum(item.carbs for item in current_contents.items)
+    total_fat = sum(item.fat for item in current_contents.items)
+
+    totals = {"calories": total_calories, "protein": total_protein, "carbs": total_carbs, "fat": total_fat}
+    
+    # Save back to DB
+    db_log.food_items_json = current_contents.json()
+    db_log.total_macros_json = json.dumps(totals)
+    
+    db.add(db_log)
+    db.commit()
+    db.refresh(db_log)
+    return db_log

@@ -1,6 +1,6 @@
 # backend/app/db/models.py
 from sqlalchemy import (Column, Integer, String, Boolean, Date, ForeignKey, 
-                        Enum, Float)
+                        Enum, Float, Numeric)
 from sqlalchemy.orm import relationship
 import enum
 
@@ -47,8 +47,8 @@ class UserProfile(Base):
     
     age = Column(Integer, nullable=True)
     # Store height in cm, weight in kg
-    height = Column(Float, nullable=True) 
-    weight = Column(Float, nullable=True)
+    height = Column(Numeric(10, 2), nullable=True) 
+    weight = Column(Numeric(10, 2), nullable=True)
     
     goal = Column(Enum(UserGoal), nullable=True, default=UserGoal.maintain_weight)
     activity_level = Column(Enum(ActivityLevel), nullable=True, default=ActivityLevel.sedentary)
@@ -92,10 +92,10 @@ class FoodItem(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, index=True)
     # Per 100g
-    calories_per_100g = Column(Float, nullable=False)
-    protein_per_100g = Column(Float, nullable=False)
-    carbs_per_100g = Column(Float, nullable=False)
-    fat_per_100g = Column(Float, nullable=False)
+    calories_per_100g = Column(Numeric(10, 2), nullable=False)
+    protein_per_100g = Column(Numeric(10, 2), nullable=False)
+    carbs_per_100g = Column(Numeric(10, 2), nullable=False)
+    fat_per_100g = Column(Numeric(10, 2), nullable=False)
     # We can add user_id to make this a user-specific food db
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 

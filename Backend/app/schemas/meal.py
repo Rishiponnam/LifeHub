@@ -1,11 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date
-import json
+import uuid
 
 # This schema will represent a single food item *within* a log
 # We store the macros directly, not just a reference, to
 # capture the data at that point in time.
 class LoggedFoodItem(BaseModel):
+    log_item_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     quantity_g: float
     calories: float

@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Body, Query
+from fastapi import APIRouter, Depends, HTTPException, Body, Query, status
 from sqlalchemy.orm import Session
 from datetime import date
-
+from pydantic import BaseModel
 from app.api.v1 import deps
 from app.db.models.models import User
 from app.schemas import meal
@@ -13,6 +13,21 @@ from app.services import nutrition_ai
 import json
 
 router = APIRouter()
+
+# This is a helper schema for the delete endpoint
+class DeleteItemPayload(BaseModel):
+    date: date
+    log_item_id: str
+
+# Helper function to parse log response (we'll reuse this)
+def parse_log_response(db_log: UserMealLog):
+    return {
+        "id": db_log.id,
+        "date": db_log.date,
+        "user_id": db_log.user_id,
+        "food_items": json.loads(db_log.food_items_json),
+        "total_macros": json.loads(db_log.total_macros_json)
+    }
 
 # --- Food Library Endpoints ---
 
@@ -98,6 +113,43 @@ def get_meal_log(
         "food_items": json.loads(db_log.food_items_json),
         "total_macros": json.loads(db_log.total_macros_json)
     }
+
+@router.put("/meals/log-item/{log_item_id}", response_model=UserMealLog)
+def update_a_logged_item(
+    *,
+    db: Session = Depends(deps.get_db),
+    log_item_id: str,
+    log_date: date = Query(...),
+    item_in: LoggedFoodItem,
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Update a single food item in a user's log.
+    """
+    db_log = crud_meal.get_meal_log_by_date(db, user_id=current_user.id, log_date=log_date)
+    if not db_log:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found for this date")
+
+    updated_log = crud_meal.update_logged_item(db, db_log=db_log, log_item_id=log_item_id, item_in=item_in)
+    return parse_log_response(updated_log)
+
+@router.delete("/meals/log-item", response_model=UserMealLog)
+def delete_a_logged_item(
+    *,
+    db: Session = Depends(deps.get_db),
+    payload: DeleteItemPayload,
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Delete a single food item from a user's log.
+    (We use a POST-style delete to send a body)
+    """
+    db_log = crud_meal.get_meal_log_by_date(db, user_id=current_user.id, log_date=payload.date)
+    if not db_log:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found for this date")
+
+    updated_log = crud_meal.delete_logged_item(db, db_log=db_log, log_item_id=payload.log_item_id)
+    return parse_log_response(updated_log)
 
 # --- AI Endpoint ---
 
