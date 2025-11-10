@@ -23,7 +23,7 @@ class UserUpdate(BaseModel):
 #     is_active: bool
 
 #     class Config:
-#         orm_mode = True
+#         from_attributes = True
 
 # # Properties to return to client
 # class User(UserInDBBase):
@@ -37,7 +37,7 @@ class UserInDBBase(BaseModel): # Renamed from UserBase in previous step
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Properties to return to client
 class User(UserInDBBase):

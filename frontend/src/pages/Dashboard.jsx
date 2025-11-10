@@ -38,7 +38,7 @@ export default function Dashboard() {
           title="Workouts"
           description="Build workout plans, log your sessions, and track progress."
           linkTo="/workouts"
-          enabled={false}
+          enabled={true}
         />
         <ServiceCard
           title="AI Guidance"

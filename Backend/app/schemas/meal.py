@@ -33,7 +33,7 @@ class UserMealLog(UserMealLogBase):
     total_macros: dict # We'll store totals like {"calories": 2000, ...}
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         
 # Schema for the AI analysis endpoint
 class NaturalLanguageQuery(BaseModel):
@@ -56,4 +56,4 @@ class MacroAnalysisResponse(BaseModel):
 #     user_id: int
 
 #     class Config:
-#         orm_mode = True
+#         from_attributes = True

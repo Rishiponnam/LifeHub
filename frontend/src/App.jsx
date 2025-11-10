@@ -11,6 +11,10 @@ import AILoggerPage from './pages/AILoggerPage';
 import MyFoodsPage from './pages/MyFoodsPage';
 import MealSummaryPage from './pages/MealSummaryPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import WorkoutHubPage from './pages/WorkoutHubPage';
+import WorkoutPlansPage from './pages/WorkoutPlansPage';
+import WorkoutLogPage from './pages/WorkoutLogPage';
+import WorkoutCalendarPage from './pages/WorkoutCalendarPage';
 
 // Placeholder for coming soon pages
 const ComingSoon = () => <div className="App-header"><h1>Coming Soon!</h1></div>;
@@ -35,9 +39,16 @@ function App() {
         <Route path="/nutrition/ai-logger" element={<AILoggerPage />} />
         <Route path="/nutrition/my-foods" element={<MyFoodsPage />} />
         <Route path="/nutrition/summary" element={<MealSummaryPage />} />
+
+        {/* --- WORKOUT ROUTES --- */}
+        <Route path="/workouts" element={<WorkoutHubPage />} />
+        <Route path="/workouts/plans" element={<WorkoutPlansPage />} />
+        <Route path="/workouts/log" element={<WorkoutLogPage />} />
+        <Route path="/workouts/log/:planId" element={<WorkoutLogPage />} /> {/* For logging from a plan */}
+        <Route path="/workouts/calendar" element={<WorkoutCalendarPage />} />
         
         {/* Placeholder Routes */}
-        <Route path="/workouts" element={<ComingSoon />} />
+        {/* <Route path="/workouts" element={<ComingSoon />} /> */}
         <Route path="/guidance" element={<ComingSoon />} />
         <Route path="/analytics" element={<ComingSoon />} />
         <Route path="/progress" element={<ComingSoon />} />

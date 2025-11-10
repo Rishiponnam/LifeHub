@@ -1,6 +1,6 @@
 # backend/app/db/models.py
 from sqlalchemy import (Column, Integer, String, Boolean, Date, ForeignKey, 
-                        Enum, Float, Numeric)
+                        Enum, Float, Numeric, Text)
 from sqlalchemy.orm import relationship
 import enum
 
@@ -56,34 +56,66 @@ class UserProfile(Base):
     # One-to-one relationship back to User
     user = relationship("User", back_populates="profile")
 
+# --- NEW: Enums for Workouts ---
+class ExerciseMuscleGroup(str, enum.Enum):
+    chest = "chest"
+    back = "back"
+    shoulders = "shoulders"
+    biceps = "biceps"
+    triceps = "triceps"
+    legs = "legs"
+    core = "core"
+    full_body = "full_body"
+    other = "other"
+
+class ExerciseDifficulty(str, enum.Enum):
+    beginner = "beginner"
+    intermediate = "intermediate"
+    advanced = "advanced"
+
+class WorkoutGoalType(str, enum.Enum):
+    strength = "strength"
+    hypertrophy = "hypertrophy"
+    endurance = "endurance"
+    general = "general"
 
 # --- Placeholder Models for Later Phases ---
 # We'll fill these in as we go, but let's define them so Alembic sees them.
-
+# --- UPDATE: Exercise Model ---
 class Exercise(Base):
     __tablename__ = "exercises"
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, nullable=False)
-    muscle_group = Column(String, index=True)
+    name = Column(String, unique=True, nullable=False, index=True)
+    muscle_group = Column(Enum(ExerciseMuscleGroup), index=True)
     equipment = Column(String, nullable=True)
+    difficulty = Column(Enum(ExerciseDifficulty), default=ExerciseDifficulty.intermediate)
     
+    # Optional: Add instructions
+    instructions = Column(Text, nullable=True)
+
+# --- UPDATE: WorkoutPlan Model ---
 class WorkoutPlan(Base):
     __tablename__ = "workout_plans"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"))
-    # We'll use JSON to store the list of exercises
-    exercises_json = Column(String) # Or use SQLAlchemy's JSON type if Postgres
+    goal_type = Column(Enum(WorkoutGoalType), default=WorkoutGoalType.general)
+    
+    # We'll store the list of exercises, sets, and reps as a JSON string
+    plan_details_json = Column(Text, nullable=False) # Renamed from exercises_json
     
     owner = relationship("User", back_populates="workout_plans")
 
+# --- UPDATE: WorkoutLog Model ---
 class WorkoutLog(Base):
     __tablename__ = "workout_logs"
     id = Column(Integer, primary_key=True)
     date = Column(Date, nullable=False, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    exercises_json = Column(String) # What was actually done
-    notes = Column(String, nullable=True)
+    
+    # We'll store what was *actually* done (sets, reps, weight) as a JSON string
+    log_details_json = Column(Text, nullable=False) # Renamed from exercises_json
+    notes = Column(Text, nullable=True)
     
     owner = relationship("User", back_populates="workout_logs")
 
