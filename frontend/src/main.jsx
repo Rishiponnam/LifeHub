@@ -2,8 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { AuthProvider } from './contexts/AuthContext'
+// import { AuthProvider } from './contexts/AuthContext'
 import { BrowserRouter } from 'react-router-dom'
+import { store } from './store/store'
+import { Provider } from 'react-redux'
 
 // ChartJS registration moved from DailySummary component
 // import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -11,10 +13,12 @@ import { BrowserRouter } from 'react-router-dom'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter> 
-      <AuthProvider>
+    <Provider store={store}>
+      <BrowserRouter> 
+        {/* <AuthProvider> */}
         <App />
-      </AuthProvider>
-    </BrowserRouter> 
+        {/* </AuthProvider> */}
+      </BrowserRouter> 
+    </Provider>
   </React.StrictMode>,
 )
