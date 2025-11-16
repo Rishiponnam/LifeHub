@@ -1,5 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../store/authSlice';
 import './Dashboard.css';
 
 // A reusable component for our service cards
@@ -18,13 +20,18 @@ const ServiceCard = ({ title, description, linkTo, enabled = false }) => {
 };
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  // const { user, logout } = useAuth();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Welcome!</h1>
-        <button onClick={logout} className="logout-btn">Logout</button>
+        <button
+          onClick={() => dispatch(logout())}
+          className="logout-btn"
+        >Logout</button>
       </header>
       
       <div className="services-grid">

@@ -1,13 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 // We will create these slice files next
-import authReducer from './authSlice';
-import nutritionReducer from './nutritionSlice';
-import workoutReducer from './workoutSlice';
+import authslice from './authSlice';
+import nutritionSlice from './nutritionSlice';
+import workoutSlice from './workoutSlice';
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
-    auth: authReducer,
-    nutrition: nutritionReducer,
-    workouts: workoutReducer,
+    auth: authslice,
+    nutrition: nutritionSlice,
+    workout: workoutSlice,
   },
 });
+export { store };

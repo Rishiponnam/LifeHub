@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import apiClient from '../api/apiClient';
 import { useAuth } from '../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { createProfile } from '../store/authSlice';
 
 export default function ProfileSetupPage() {
-  const { user, setUser } = useAuth(); // Get user and a way to update it
+  const dispatch = useDispatch();
+  const { user, loading, error } = useSelector((state) => state.auth);
+  
   const [formData, setFormData] = useState({
-    age: '',
-    height: '',
-    weight: '',
-    goal: 'maintain_weight',
-    activity_level: 'sedentary',
+    age: '', height: '', weight: '',
+    goal: 'maintain_weight', activity_level: 'sedentary',
   });
-  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,9 +19,7 @@ export default function ProfileSetupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     try {
-      // Convert to numbers
       const profileData = {
         age: parseInt(formData.age),
         height: parseFloat(formData.height),
@@ -30,15 +28,13 @@ export default function ProfileSetupPage() {
         activity_level: formData.activity_level,
       };
 
-      // Call the protected profile endpoint
-      const response = await apiClient.post('/profile/', profileData);
-      
-      // Update the user in our global state!
-      setUser({ ...user, profile: response.data });
-      // App.jsx will now see user.profile and show the Dashboard
-      
+      // --- DISPATCH CREATE PROFILE THUNK ---
+      await dispatch(createProfile(profileData)).unwrap();
+      // No navigation needed, ProtectedRoute will see the user.profile
+      // is now filled and will automatically redirect to '/'
+
     } catch (err) {
-      setError(err.response?.data?.detail || 'An error occurred.');
+      console.error('Failed to create profile:', err);
     }
   };
 

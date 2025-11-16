@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserData } from './store/authSlice';
 import './App.css';
 
 // Page Components
@@ -23,6 +25,19 @@ const ComingSoon = () => <div className="App-header"><h1>Coming Soon!</h1></div>
 
 function App() {
   const { token, loading, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (token && !user) {
+      dispatch(fetchUserData());
+    }
+  }, [dispatch, token, user]); // Run only when token or dispatch changes
+
+  // Show a global loading screen while checking token
+  if (loading && !token) { 
+    // This is the brief "logging in..." state
+    return <div className="App-header">Loading...</div>;
+  }
 
   if (loading) {
     return <div className="App-header">Loading app...</div>;
