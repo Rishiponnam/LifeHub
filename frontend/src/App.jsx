@@ -1,9 +1,16 @@
 import { useEffect } from 'react';
+import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserData } from './store/authSlice';
 import './App.css';
+
+// Layout Components
+import Navbar from './components/Navbar';
+import Sidebar from './components/sidebar';
+import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Page Components
 import LoginPage from './pages/LoginPage';
@@ -13,19 +20,21 @@ import NutritionHubPage from './pages/NutritionHubPage';
 import AILoggerPage from './pages/AILoggerPage';
 import MyFoodsPage from './pages/MyFoodsPage';
 import MealSummaryPage from './pages/MealSummaryPage';
-import ProtectedRoute from './components/ProtectedRoute';
+// import ProtectedRoute from './components/ProtectedRoute';
 import WorkoutHubPage from './pages/WorkoutHubPage';
 import WorkoutPlansPage from './pages/WorkoutPlansPage';
 import WorkoutLogPage from './pages/WorkoutLogPage';
 import WorkoutCalendarPage from './pages/WorkoutCalendarPage';
-import Navbar from './components/Navbar';
+// import Navbar from './components/Navbar';
+import Home from './pages/Home';
 
 // Placeholder for coming soon pages
-const ComingSoon = () => <div className="App-header"><h1>Coming Soon!</h1></div>;
+const ComingSoon = () => <div className="App-header" style={{marginTop: '70px'}}><h1>Coming Soon!</h1></div>;
 
 function App() {
   const { token, loading, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (token && !user) {
@@ -45,16 +54,23 @@ function App() {
 
   return (
       <div className="app-container">
-          <Navbar /> {/* Navbar here */}
-          <main className="main-content"> {/* Wrap routes in a 'main' tag */}
+          {/* Layout Wrapper */}
+          {token && (
+            <>
+              <Navbar onToggleSidebar={() => setSidebarOpen(true)} />
+              <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
+            </>
+          )}
+          <div className="main-content"> {/* Wrap routes in a 'main' tag */}
               <Routes>
                   {/* Public Routes */}
                   <Route path="/login" element={!token ? <LoginPage /> : <Navigate to="/" />} />
-                  <Route path="/profile-setup" element={token && !user?.profile ? <ProfileSetupPage /> : <Navigate to="/" />} />
+                  <Route path="/profile-setup" element={token && !user?.profile ? <ProfileSetupPage /> : <Navigate to="/login" />} />
 
                   {/* Protected Routes */}
                   <Route element={<ProtectedRoute />}>
-                      <Route path="/" element={<Dashboard />} />
+                      {/* <Route path="/" element={<Dashboard />} /> */}
+                      <Route path="/" element={<Home />} />
                       <Route path="/nutrition" element={<NutritionHubPage />} />
                       <Route path="/nutrition/ai-logger" element={<AILoggerPage />} />
                       <Route path="/nutrition/my-foods" element={<MyFoodsPage />} />
@@ -77,7 +93,8 @@ function App() {
                   {/* Fallback route */}
                   <Route path="*" element={<Navigate to="/" />} />
               </Routes>
-          </main>
+          </div>
+          {token && <Footer />}
       </div>
   );
 }
